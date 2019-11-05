@@ -1,21 +1,29 @@
 function selectNovel() {
     var fileDom = document.getElementById("file");
+    var charsetDom = document.getElementById('charsetSelect')
     var fileList = fileDom.files;//获取到文件列表
     var fileName = fileList[0].name; // 文件名
     var reader = new FileReader();//新建一个FileReader
-    reader.readAsText(fileList[0], "UTF-8");//读取文件 
+    var charset = charsetDom.value;
+    reader.readAsText(fileList[0], charset);//读取文件 
     reader.onload = function (evt) { //读取完文件之后会回来这里
         var fileString = evt.target.result; // 读取文件内容
         NovelParser.init();
-        text = NovelParser.parser(fileString);
-        console.log(text);
-        var outputFile = new File([text], fileName, {type: "text/plain;charset=utf-8"});
+        text = NovelParser.parse(fileString);
+        var outputFile = new File([text], fileName, {type: "text/plain;charset=" + charset});
         saveAs(outputFile);
     }
 }
 
+function cerry (func) {
+    var _args = [].slice.call(arguments, 1);
+    return function () {
+        return func.apply(this, [].concat.call(arguments, _args));
+    };
+}
+
 var NovelParser = {
-    parser: function(novelStr){
+    parse: function(novelStr){
         var rowEnd = "(?:\n|$)";
         var pattern = this.pattern;
         for(var i = 0; i < pattern.length; i++){
@@ -57,8 +65,8 @@ var NovelParser = {
                 return false;
             }
         }else if(flag === 'pattern'){
-            val = key;
-            var pattern = this.pattern;
+            var cb = key;
+            var pattern = cb.call(this);
             if(pattern.indexOf(val) < 0){
                 pattern.push(val);
             }else{
@@ -67,10 +75,11 @@ var NovelParser = {
         }
         return true;
     },
-    extendUnit: function(key, val){
-        return this.extend('unit', key, val);
-    },
-    extendPattern: function(val){
-        return this.extend('pattern', val);
-    }
+    extendUnit: cerry(this.extend, 'unit'),
+    /**
+     * 
+     * @param { func } cb 
+     * cb返回值应为pattern
+     */
+    extendPattern: cerry(this.extend, 'pattern')
 };

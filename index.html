@@ -4,10 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>TXT小说章节格式化工具</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <input type="file" name="file" id="file" onchange="selectNovel()">
+    <h1 class="header">
+        TXT小说章节格式化工具
+    </h1>
+    <div class="main">
+        <div class="file-parser flex-center">
+            <div id="fileSelector" class="file-selector flex-center">
+                <span>选择文件</span>
+                <input type="file" name="file" id="file" class="file" onchange="selectNovel()">
+            </div>
+            <div class="charset-selector">
+                <select name="charsetSelect" id="charsetSelect" class="charset-select">
+                    <option value="UTF-8">UTF-8</option>
+                    <option value="GBK">GBK</option>
+                </select>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 <script src="js/FileSaver.js"></script>
